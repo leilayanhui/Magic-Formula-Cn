@@ -1,7 +1,7 @@
 # Magic-Formula-Cn
 适用中国市场的神奇公式
 
-### 前端效果
+### 一、前端效果
 
 **登陆页面**
 
@@ -23,7 +23,7 @@
 
 千万级，是否给点激进的组合，比如把ROTC换成利润增速	
 
-### 开发日志
+### 二、开发日志
 
 `8w：170220-170301` 
 
@@ -37,5 +37,12 @@
 
 - [**8w技术点汇总**](https://github.com/leilayanhui/Magic-Formula-Cn/issues/6)
 
+`9w：170301-1703013` 
 
+- [**@fatfox_抓取 tushare 的数据代码(已拿代码，待代码上传GitHub)**](https://github.com/leilayanhui/Magic-Formula-Cn/tree/fatfox-db-tushare)
 
+- [**@蕙蕙_荐股页面批量倒入 html table(待代码上传GitHub)**]()
+
+- [**@zhangshiying_利用神奇公式官方主页，编写项目的help html 简介、使用方法(待代码上传GitHub)**]()
+
+- [**@蕙蕙_9w技术点汇总**](https://github.com/leilayanhui/Magic-Formula-Cn/issues/8)
