@@ -39,7 +39,7 @@
 
 `9w：170301-1703013` 
 
-- [**@fatfox_抓取 tushare 的数据代码(已拿代码，待代码上传GitHub)**]()
+- [**@fatfox_抓取 tushare 的数据代码(已拿代码，待代码上传GitHub)**](https://github.com/leilayanhui/Magic-Formula-Cn/tree/fatfox-db-tushare)
 
 - [**@蕙蕙_荐股页面批量倒入 html table(待代码上传GitHub)**]()
 
