@@ -1,4 +1,4 @@
-https://github.com/leilayanhui/Magic-Formula-Cn/tree/fatfox-db-tushare# Magic-Formula-Cn
+# Magic-Formula-Cn
 适用中国市场的神奇公式
 
 ### 一、前端效果
