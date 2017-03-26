@@ -4,11 +4,17 @@
 {% block title %}Login Page{% endblock %}
 
  {% block page_content %}
+   {% if current_user.is_authenticated %}
    <div class='login'>
-     <h1>你好，聪明的投资者</h1><br />
+     <h1>你好，聪明的投资者<br /><br /></h1>
+     <h4>请进入荐股页面</h4>
    </div>
-
+  {% else %}
+  <div class='login'>
+    <h1>你好，聪明的投资者<br /><br /></h1>
+  </div>
   {{ wtf.quick_form(form) }}
   <br>
   <p>新用户? <a href="{{ url_for('.register') }}">注册</a></p>
+  {% endif %}
 {% endblock %}

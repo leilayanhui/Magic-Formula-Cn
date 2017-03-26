@@ -18,6 +18,11 @@
         <li>
           <a href="{{ url_for('main.help') }}">说明</a>
         </li>
+        {% if current_user.is_authenticated %}
+        <li>
+          <a href="{{ url_for('main.stocks') }}">荐股</a>
+        </li>
+        {% endif %}
       </ul>
       <ul class="nav navbar-nav navbar-right">
         {% if current_user.is_authenticated %}
@@ -41,5 +46,17 @@
   {% endfor %}
 
   {% block page_content %}{% endblock %}
+</div>
+{% endblock %}
+
+{% block mastfoot %}
+<div class='mastfoot'>
+  <div class='inner'>
+    <p>
+      'Copyright '
+      <a href='https://github.com/leilayanhui/Magic-Formula-Cn/'>Magic Formula Cn</a>
+      ' 2017'
+    </p>
+  </div>
 </div>
 {% endblock %}
