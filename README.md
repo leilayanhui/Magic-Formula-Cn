@@ -6,6 +6,19 @@
 
 ## [网站](http://magicformulacn.herokuapp.com/)
 
+## 数据来源
+### 东方财富软件
+最近四季的财报数据
+
+**[软件下载](http://acttg.eastmoney.com/pub/web_pc_dcsy_top1_02_01_01_1)**
+
+### tushare
+[实时行情](http://tushare.org/trading.html#id4)
+  ts.get_today_all()
+
+**[使用前提](http://tushare.org/index.html#id4)**
+
+
 ## 开发日志
 
 `11w: 20170319-20170325`
