@@ -1,39 +1,43 @@
-# app/models.py
+# -*- conding: utf-8 -*-
+# config.py
+import os
+import re
+basedir = os.path.abspath(os.path.dirname(__file__))
+# SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'data.db')
+# SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+# SQLALCHEMY_TRACK_MODIFICATIONS = False
+# SESSION_TYPE = 'sqlalchemy'
 
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
-from . import db, login_manager
+#__init__.py
+import json
+from flask import Flask
+# from sqlalchemy import create_engine,and_
+from flask_script import Manager,Shell
+from flask_sqlalchemy import SQLAlchemy
+from flask_session import Session,SqlAlchemySessionInterface
 
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.db')
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-class User(UserMixin, db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, index=True)
-    password_hash = db.Column(db.String(128))
+manager = Manager(app)
+db = SQLAlchemy(app)
 
-    @property
-    def password(self):
-        raise AttributeError('password is not a readable attribute')
+def make_shell_context():
+    return dict(app=app, db=db, BasicTable=BasicTable)
 
-    @password.setter
-    def password(self, password):
-        self.password_hash = generate_password_hash(password)
+manager.add_command("shell", Shell(make_context=make_shell_context))
 
-    def verify_password(self, password):
-        return check_password_hash(self.password_hash, password)
+# 可在本地或后台操作
+#import tushare as ts
 
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
+#def getToday():
+#    '''从tushare获取当天报价表'''
+#    data = ts.get_today_all()
+#    data.to_excel('today.xls')
 
-    def __repr__(self):
-        return '%d, %s, %s' % (self.id, self.username, self.password_hash)
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-
+# --------basicModels.py文件分割线--------
 from datetime import datetime,date,timedelta
 import xlrd
 
@@ -90,7 +94,6 @@ class TodayTable(db.Model):
 
     def __repr__(self):
         return '<basicTable %r>' % self.name
-
 
 def getData(filename,sheet):
     data = xlrd.open_workbook(filename)
@@ -213,7 +216,15 @@ def getMFData():
                 data_list.append(r_tuple)
     return data_list
 
-def magsort():
+if __name__ == '__main__':
+    '''以下是测试代码'''
+    # db.drop_all() #删除所有表
+    # db.create_all() #新建所有表
+    # getToday()
+    # BasicModel('basic.xls',u'selResult').insert()
+    # BasicModel('today.xls',u'Sheet1').updateToday()
+    # TodayModel('today.xls',u'Sheet1').insert()
+    # record = BasicTable.query.filter_by(code = '000625').first()
     d = getMFData()
     sortRoi = []
     sortEvebit = []
@@ -251,4 +262,80 @@ def magsort():
     sortStock = sorted(sortStock, key=lambda sortStock: sortStock[1])
 #    print(sortStock)
 
-    return sortStock
+    for i in range(30):
+        print ("排名第%(num)s 的股票是 %(stock)s，%(name)s" % {'num':i+1,"stock":sortStock[i][0],"name":sortStock[i][2]})
+
+
+
+'''
+ebitev = (income1 + income2 + income3 + income4 + incometax1 + incometax2 + incometax3 +  incometax4 + finanExp1 +/
+    finanExp2 + finanExp3 + finanExp4)/mktcap
+
+ROI = (income1 + income2 + income3 + income4 + incometax1 + incometax2 + incometax3 +  incometax4 + finanExp1 +/
+    finanExp2 + finanExp3 + finanExp4)/(THEquity- goodwill - iAssets)
+'''
+
+'''
+d = [('000001', 0.7,3), ('000002',0.2, 2), ('000003',0.3, 3), ('000004',0.6, 4)]
+sortRoi = []
+sortEvebit = []
+sortStock = []
+
+d = sorted(d, key=lambda d: d[1])
+d.reverse()
+print(d)
+#按照ROI进行排序
+
+for num in range(len(d)):
+    sortRoi.append([d[num][0],num+1])
+sortRoi = sorted(sortRoi, key=lambda sortRoi: sortRoi[0])
+#按股票代码排序
+print(sortRoi)
+#给出每个股票的ROI排行
+
+d = sorted(d, key=lambda d: d[2])
+d.reverse()
+#ebitev进行排序
+
+for num in range(len(d)):
+    sortEvebit.append([d[num][0],num+1])
+sortEvebit = sorted(sortEvebit, key=lambda sortEvebit: sortEvebit[0])
+#按股票代码排序
+print(sortEvebit)
+#给出每个股票的ebitev排行
+
+for num in range(len(d)):
+    sortStock.append([sortRoi[num][0],sortRoi[num][1]+sortEvebit[num][1]])
+print(sortStock)
+
+sortStock = sorted(sortStock, key=lambda sortStock: sortStock[1])
+print(sortStock)
+
+for i in range(4):
+    print("排名第%(num)s 的股票是 %(stock)s" % {'num':i+1,"stock":sortStock[i][0]})
+
+def getMFData():
+    #获取神奇公式计算结果
+    result = BasicTable.query.all()
+    data_list = []
+    for record in result:
+        if record.mktcap is not None:
+            r_dict = {'income1':record.income1,'income2':record.income2,'income3':record.income3,'income4':record.income4,
+                 'incometax1':record.incometax1,'incometax2':record.incometax2,'incometax3':record.incometax3,'incometax4':record.incometax4,
+                 'finanExp1':record.finanExp1,'finanExp2':record.finanExp2,'finanExp3':record.finanExp3,'finanExp4':record.finanExp4,
+                 'THEquity':record.THEquity,'iAssets':record.iAssets,'goodwill':record.goodwill,'totals':record.totals,'mktcap':record.mktcap}
+            # print(record.code,r_dict)
+            ebitev = (r.income1'] + r.income2'] + r.income3'] + r.income4'] \
+                    + r.incometax1'] + r.incometax2'] + r.incometax3'] +  r.incometax4'] \
+                    + r.finanExp1'] + r.finanExp2'] + r.finanExp3'] + r.finanExp4'])/r.mktcap']
+            # print(ebitev)
+            if record.THEquity != 0:
+                ROI = (r.income1'] + r.income2'] + r.income3'] + r.income4']\
+                    + r.incometax1'] + r.incometax2'] + r.incometax3'] +  r.incometax4'] \
+                    + r.finanExp1'] + r.finanExp2'] + r.finanExp3'] + r.finanExp4'])/(r.THEquity']\
+                    - r.goodwill'] - r.iAssets'])
+                # print(ROI)
+                r_tuple = (record.code,ebitev,ROI)
+                data_list.append(r_tuple)
+    return data_list
+'''

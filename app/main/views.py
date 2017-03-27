@@ -4,7 +4,7 @@ from flask_login import login_user, logout_user, login_required
 from . import main
 from .forms import LoginForm, RegisterForm
 from .. import db
-from ..models import User
+from ..models import User, magsort
 
 
 @main.route('/', methods=['GET', 'POST'])
@@ -51,4 +51,5 @@ def help():
 
 @main.route('/stocks')
 def stocks():
-    return render_template('stocks.html')
+    stocks_list = magsort()
+    return render_template('stocks2.html', stocks_list=stocks_list)
