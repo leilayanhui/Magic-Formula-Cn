@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Stocks - Magic Formula Investing{% endblock %}
+
+ {% block page_content %}
+ {% if current_user.is_authenticated %}
+ <div class='stocks'>
+
+      <h2 class="page-header">神奇公式股票列表</h2>
+      <h4>2016 三季报</h4>
+
+      <div class="table table-bordered">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>综合排名</th>
+                <th>证券代码</th>
+                <th>证券名称</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for i in range(30) %}
+              <tr>
+                <td>{{ i+1 }}</td>
+                <td>{{ stocks_list[i][0] }}</td>
+                <td>{{ stocks_list[i][2] }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+       </div>
+ </div>
+
+ {% else %}
+ <h3>请先登陆</h3>
+ {% endif %}
+{% endblock %}

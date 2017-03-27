@@ -1,0 +1,62 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}Magic Formula Investing{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-inverse" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class='icon-bar'></span>
+        <span class='icon-bar'></span>
+        <span class='icon-bar'></span>
+      </button>
+      <a class="navbar-brand" href="{{ url_for('main.login') }}">神奇公式筛股器</a>
+    </div>
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+          <a href="{{ url_for('main.help') }}">说明</a>
+        </li>
+        {% if current_user.is_authenticated %}
+        <li>
+          <a href="{{ url_for('main.stocks') }}">荐股</a>
+        </li>
+        {% endif %}
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        {% if current_user.is_authenticated %}
+        <li><a href="{{ url_for('main.logout') }}">登出</a></li>
+        {% else %}
+        <li><a href="{{ url_for('main.login') }}">登入</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class='container'>
+  {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      {{ message }}
+    </div>
+  {% endfor %}
+
+  {% block page_content %}{% endblock %}
+</div>
+{% endblock %}
+
+{% block mastfoot %}
+<div class='mastfoot'>
+  <div class='inner'>
+    <p>
+      'Copyright '
+      <a href='https://github.com/leilayanhui/Magic-Formula-Cn/'>Magic Formula Cn</a>
+      ' 2017'
+    </p>
+  </div>
+</div>
+{% endblock %}

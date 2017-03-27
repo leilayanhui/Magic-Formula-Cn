@@ -4,6 +4,7 @@
 ## 简介
 借鉴格林布拉特的神奇公式，代入中国公司的财报数据，计算每支的投资回报率和收益率，依值排序，相加这两个排名，获得综合排名。排名越靠前的股票，其投资回报率和收益率的组合越佳。定期分批买入排名靠前的股票，持有一年左右抛出。既能获得优质低价的股票，又能节省大量选股时间。
 
+
 ## [网站](http://magicformulacn.herokuapp.com/)
 
 ## 数据来源
@@ -13,8 +14,7 @@
 **[软件下载](http://acttg.eastmoney.com/pub/web_pc_dcsy_top1_02_01_01_1)**
 
 ### tushare
-[实时行情](http://tushare.org/trading.html#id4)
-  ts.get_today_all()
+[实时行情](http://tushare.org/trading.html#id4)  ts.get_today_all()
 
 **[使用前提](http://tushare.org/index.html#id4)**
 
@@ -62,3 +62,4 @@
 - [**文件、类、函数中文注释**](https://github.com/leilayanhui/Magic-Formula-Cn/wiki/StructureClassDef)
 
 - [**8w技术点汇总**](https://github.com/leilayanhui/Magic-Formula-Cn/issues/6)
+
