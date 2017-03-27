@@ -17,7 +17,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session,SqlAlchemySessionInterface
 
 app = Flask(__name__)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.db')
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -65,7 +64,9 @@ class BasicTable(db.Model):
     iAssets = db.Column(db.Integer) #无形资产
     goodwill = db.Column(db.Integer) #商誉
     totals = db.Column(db.Integer) #总股本
+    TLiab = db.Column(db.Integer) #负债合计
     mktcap = db.Column(db.Integer) #总市值
+
 
     def __repr__(self):
         return '<basicTable %r>' % self.name
@@ -128,7 +129,8 @@ class BasicModel(object):
                                 THEquity = line[16], #所有者权益合计
                                 iAssets = line[17], #无形资产
                                 goodwill = line[18], #商誉
-                                totals = line[19]) #总股本
+                                totals = line[19], #总股本
+                                TLiab = line[20]) #负债合计
             db.session.add(record)
             db.session.commit()
 
@@ -194,13 +196,144 @@ class TodayModel(object):
             db.session.add(record)
             db.session.commit()
 
+def getMFData():
+    '''获取神奇公式计算结果'''
+    result = BasicTable.query.all()
+    data_list = []
+    for r in result:
+        if r.mktcap is not None:
+            ebitev = (r.income1 + r.income2 + r.income3 + r.income4 \
+                    + r.incometax1 + r.incometax2 + r.incometax3 +  r.incometax4 \
+                    + r.finanExp1 + r.finanExp2 + r.finanExp3 + r.finanExp4)/(r.mktcap + r.TLiab)
+            # print(ebitev)
+            if r.THEquity != 0:
+                ROI = (r.income1 + r.income2 + r.income3 + r.income4\
+                    + r.incometax1 + r.incometax2 + r.incometax3 +  r.incometax4 \
+                    + r.finanExp1 + r.finanExp2 + r.finanExp3 + r.finanExp4)/(r.THEquity\
+                    - r.goodwill - r.iAssets)
+                # print(ROI)
+                r_tuple = (r.code,ebitev,ROI)
+                data_list.append(r_tuple)
+    return data_list
+
 if __name__ == '__main__':
     '''以下是测试代码'''
     db.drop_all() #删除所有表
     db.create_all() #新建所有表
+    getToday()
     BasicModel('basic.xls',u'selResult').insert()
     BasicModel('today.xls',u'Sheet1').updateToday()
     TodayModel('today.xls',u'Sheet1').insert()
-    record = BasicTable.query.filter_by(code = '300151').first()
-    a = record.finanExp1
-    print(a)
+    # record = BasicTable.query.filter_by(code = '000625').first()
+    d = getMFData()
+    sortRoi = []
+    sortEvebit = []
+    sortStock = []
+
+    d = sorted(d, key=lambda d: d[1])
+    d.reverse()
+    print(d)
+    #按照ROI进行排序
+
+    for num in range(len(d)):
+        sortRoi.append([d[num][0],num+1])
+    sortRoi = sorted(sortRoi, key=lambda sortRoi: sortRoi[0])
+    #按股票代码排序
+    print(sortRoi)
+    #给出每个股票的ROI排行
+
+    d = sorted(d, key=lambda d: d[2])
+    d.reverse()
+    #ebitev进行排序
+
+    for num in range(len(d)):
+        sortEvebit.append([d[num][0],num+1])
+    sortEvebit = sorted(sortEvebit, key=lambda sortEvebit: sortEvebit[0])
+    #按股票代码排序
+    print(sortEvebit)
+    #给出每个股票的ebitev排行
+
+    for num in range(len(d)):
+        sortStock.append([sortRoi[num][0],sortRoi[num][1]+sortEvebit[num][1]])
+    print(sortStock)
+
+    sortStock = sorted(sortStock, key=lambda sortStock: sortStock[1])
+    print(sortStock)
+
+    for i in range(10):
+        print("排名第%(num)s 的股票是 %(stock)s" % {'num':i+1,"stock":sortStock[i][0]})
+
+
+
+'''
+ebitev = (income1 + income2 + income3 + income4 + incometax1 + incometax2 + incometax3 +  incometax4 + finanExp1 +/
+    finanExp2 + finanExp3 + finanExp4)/mktcap
+
+ROI = (income1 + income2 + income3 + income4 + incometax1 + incometax2 + incometax3 +  incometax4 + finanExp1 +/
+    finanExp2 + finanExp3 + finanExp4)/(THEquity- goodwill - iAssets)
+'''
+
+'''
+d = [('000001', 0.7,3), ('000002',0.2, 2), ('000003',0.3, 3), ('000004',0.6, 4)]
+sortRoi = []
+sortEvebit = []
+sortStock = []
+
+d = sorted(d, key=lambda d: d[1])
+d.reverse()
+print(d)
+#按照ROI进行排序
+
+for num in range(len(d)):
+    sortRoi.append([d[num][0],num+1])
+sortRoi = sorted(sortRoi, key=lambda sortRoi: sortRoi[0])
+#按股票代码排序
+print(sortRoi)
+#给出每个股票的ROI排行
+
+d = sorted(d, key=lambda d: d[2])
+d.reverse()
+#ebitev进行排序
+
+for num in range(len(d)):
+    sortEvebit.append([d[num][0],num+1])
+sortEvebit = sorted(sortEvebit, key=lambda sortEvebit: sortEvebit[0])
+#按股票代码排序
+print(sortEvebit)
+#给出每个股票的ebitev排行
+
+for num in range(len(d)):
+    sortStock.append([sortRoi[num][0],sortRoi[num][1]+sortEvebit[num][1]])
+print(sortStock)
+
+sortStock = sorted(sortStock, key=lambda sortStock: sortStock[1])
+print(sortStock)
+
+for i in range(4):
+    print("排名第%(num)s 的股票是 %(stock)s" % {'num':i+1,"stock":sortStock[i][0]})
+
+def getMFData():
+    #获取神奇公式计算结果
+    result = BasicTable.query.all()
+    data_list = []
+    for record in result:
+        if record.mktcap is not None:
+            r_dict = {'income1':record.income1,'income2':record.income2,'income3':record.income3,'income4':record.income4,
+                 'incometax1':record.incometax1,'incometax2':record.incometax2,'incometax3':record.incometax3,'incometax4':record.incometax4,
+                 'finanExp1':record.finanExp1,'finanExp2':record.finanExp2,'finanExp3':record.finanExp3,'finanExp4':record.finanExp4,
+                 'THEquity':record.THEquity,'iAssets':record.iAssets,'goodwill':record.goodwill,'totals':record.totals,'mktcap':record.mktcap}
+            # print(record.code,r_dict)
+            ebitev = (r.income1'] + r.income2'] + r.income3'] + r.income4'] \
+                    + r.incometax1'] + r.incometax2'] + r.incometax3'] +  r.incometax4'] \
+                    + r.finanExp1'] + r.finanExp2'] + r.finanExp3'] + r.finanExp4'])/r.mktcap']
+            # print(ebitev)
+            if record.THEquity != 0:
+                ROI = (r.income1'] + r.income2'] + r.income3'] + r.income4']\
+                    + r.incometax1'] + r.incometax2'] + r.incometax3'] +  r.incometax4'] \
+                    + r.finanExp1'] + r.finanExp2'] + r.finanExp3'] + r.finanExp4'])/(r.THEquity']\
+                    - r.goodwill'] - r.iAssets'])
+                # print(ROI)
+                r_tuple = (record.code,ebitev,ROI)
+                data_list.append(r_tuple)
+    return data_list
+'''
