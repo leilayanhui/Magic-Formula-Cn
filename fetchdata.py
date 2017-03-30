@@ -30,12 +30,12 @@ def make_shell_context():
 manager.add_command("shell", Shell(make_context=make_shell_context))
 
 # 可在本地或后台操作
-#import tushare as ts
+import tushare as ts
 
-#def getToday():
-#    '''从tushare获取当天报价表'''
-#    data = ts.get_today_all()
-#    data.to_excel('today.xls')
+def getToday():
+    '''从tushare获取当天报价表'''
+    data = ts.get_today_all()
+    data.to_excel('today.xls')
 
 # --------basicModels.py文件分割线--------
 from datetime import datetime,date,timedelta
@@ -212,7 +212,7 @@ def getMFData():
                     + r.finanExp1 + r.finanExp2 + r.finanExp3 + r.finanExp4)/(r.THEquity\
                     - r.goodwill - r.iAssets)
                 # print(ROI)
-                r_tuple = (r.code,ebitev,ROI,r.name)
+                r_tuple = (r.code,ebitev,ROI,r.name,r.industry)
                 data_list.append(r_tuple)
     return data_list
 
@@ -220,7 +220,7 @@ if __name__ == '__main__':
     '''以下是测试代码'''
     db.drop_all() #删除所有表
     db.create_all() #新建所有表
-    # getToday()
+    getToday()
     BasicModel('basic.xls',u'selResult').insert()
     BasicModel('today.xls',u'Sheet1').updateToday()
     TodayModel('today.xls',u'Sheet1').insert()
@@ -236,7 +236,7 @@ if __name__ == '__main__':
     #按照ROI进行排序
 
     for num in range(len(d)):
-        sortRoi.append([d[num][0],num+1,d[num][3]])
+        sortRoi.append([d[num][0],num+1,d[num][3],d[num][4]])
 
     sortRoi = sorted(sortRoi, key=lambda sortRoi: sortRoi[0])
     #按股票代码排序
@@ -256,11 +256,11 @@ if __name__ == '__main__':
     #给出每个股票的ebitev排行
 
     for num in range(len(d)):
-        sortStock.append([sortRoi[num][0],sortRoi[num][1]+sortEvebit[num][1],sortRoi[num][2]])
+        sortStock.append([sortRoi[num][0],sortRoi[num][1]+sortEvebit[num][1],sortRoi[num][2],sortRoi[num][3]])
 #    print(sortStock)
 
     sortStock = sorted(sortStock, key=lambda sortStock: sortStock[1])
 #    print(sortStock)
 
     for i in range(30):
-        print ("排名第%(num)s 的股票是 %(stock)s，%(name)s" % {'num':i+1,"stock":sortStock[i][0],"name":sortStock[i][2]})
+        print ("排名第%(num)s 的股票是 %(stock)s，%(name)s，%(industry)s" % {'num':i+1,"stock":sortStock[i][0],"name":sortStock[i][2],"industry":sortStock[i][3]})

@@ -16,6 +16,7 @@
                 <th>综合排名</th>
                 <th>证券代码</th>
                 <th>证券名称</th>
+                <th>行业</th>
               </tr>
             </thead>
             <tbody>
@@ -24,6 +25,7 @@
                 <td>{{ i+1 }}</td>
                 <td>{{ stocks_list[i][0] }}</td>
                 <td>{{ stocks_list[i][2] }}</td>
+                <td>{{ stocks_list[i][3] }}</td>
               </tr>
               {% endfor %}
             </tbody>

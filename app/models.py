@@ -209,7 +209,7 @@ def getMFData():
                     + r.finanExp1 + r.finanExp2 + r.finanExp3 + r.finanExp4)/(r.THEquity\
                     - r.goodwill - r.iAssets)
                 # print(ROI)
-                r_tuple = (r.code,ebitev,ROI,r.name)
+                r_tuple = (r.code,ebitev,ROI,r.name,r.industry)
                 data_list.append(r_tuple)
     return data_list
 
@@ -225,7 +225,7 @@ def magsort():
     #按照ROI进行排序
 
     for num in range(len(d)):
-        sortRoi.append([d[num][0],num+1,d[num][3]])
+        sortRoi.append([d[num][0],num+1,d[num][3],d[num][4]])
 
     sortRoi = sorted(sortRoi, key=lambda sortRoi: sortRoi[0])
     #按股票代码排序
@@ -245,7 +245,7 @@ def magsort():
     #给出每个股票的ebitev排行
 
     for num in range(len(d)):
-        sortStock.append([sortRoi[num][0],sortRoi[num][1]+sortEvebit[num][1],sortRoi[num][2]])
+        sortStock.append([sortRoi[num][0],sortRoi[num][1]+sortEvebit[num][1],sortRoi[num][2],sortRoi[num][3]])
 #    print(sortStock)
 
     sortStock = sorted(sortStock, key=lambda sortStock: sortStock[1])
