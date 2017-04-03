@@ -65,7 +65,7 @@ class BasicTable(db.Model):
     goodwill = db.Column(db.Integer) #商誉
     totals = db.Column(db.Integer) #总股本
     TLiab = db.Column(db.Integer) #负债合计
-    mktcap = db.Column(db.Integer) #总市值
+    closeprice = db.Column(db.Integer) #收盘价
 
 
     def __repr__(self):
@@ -163,7 +163,7 @@ class BasicModel(object):
             line = table.row_values(i)
             record = BasicTable.query.filter_by(code = line[1]).first()
             if record is not None:
-                record.mktcap = line[14] #总市值
+                record.closeprice = line[8] #收盘价
                 db.session.add(record)
                 db.session.commit()
 
@@ -201,10 +201,10 @@ def getMFData():
     result = BasicTable.query.all()
     data_list = []
     for r in result:
-        if r.mktcap is not None:
+        if r.closeprice is not None:
             ebitev = (r.income1 + r.income2 + r.income3 + r.income4 \
                     + r.incometax1 + r.incometax2 + r.incometax3 +  r.incometax4 \
-                    + r.finanExp1 + r.finanExp2 + r.finanExp3 + r.finanExp4)/(r.mktcap + r.TLiab)
+                    + r.finanExp1 + r.finanExp2 + r.finanExp3 + r.finanExp4)/(r.totals * r.closeprice + r.TLiab)
             # print(ebitev)
             if r.THEquity != 0:
                 ROI = (r.income1 + r.income2 + r.income3 + r.income4\
@@ -223,7 +223,7 @@ if __name__ == '__main__':
     getToday()
     BasicModel('basic.xls',u'selResult').insert()
     BasicModel('today.xls',u'Sheet1').updateToday()
-    TodayModel('today.xls',u'Sheet1').insert()
+#    TodayModel('today.xls',u'Sheet1').insert()
     # record = BasicTable.query.filter_by(code = '000625').first()
     d = getMFData()
     sortRoi = []
